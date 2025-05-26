@@ -1,7 +1,7 @@
 #define VS_SHADERMODEL vs_3_0
 #define PS_SHADERMODEL ps_3_0
 
-float4x4 view_projection;
+float4x4 render_matrix;
 
 struct VertexInput
 {
@@ -19,7 +19,7 @@ PixelInput UntexturedVertexShader(VertexInput input)
 {
     PixelInput output;
     
-    output.Position = mul(input.Position, view_projection);
+    output.Position = mul(input.Position, render_matrix);
     output.Color = input.Color;
     
     return output;

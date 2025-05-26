@@ -11,7 +11,6 @@ namespace Physics
     {
         public static Renderer instance { get; private set; }
 
-        private BasicEffect effect;
         private Effect untexturedEffect;
 
         private VertexPositionColor[] vertices;
@@ -31,13 +30,6 @@ namespace Physics
             if (instance != null) { throw new InvalidOperationException("Renderer already initialized."); }
             instance = this;
 
-            effect = new BasicEffect(Game1.instance.GraphicsDevice)
-            {
-                TextureEnabled = false,
-                FogEnabled = false,
-                LightingEnabled = false,
-                VertexColorEnabled = true
-            };
             UpdateProjectionMatrix();
 
             vertices = new VertexPositionColor[MaxVertexCount];
@@ -56,12 +48,15 @@ namespace Physics
                 Game1.instance.GraphicsDevice.Viewport.Width,
                 Game1.instance.GraphicsDevice.Viewport.Height);
 
-            effect.Projection = Game1.camera.renderMatrix;
+            if (untexturedEffect != null)
+            { untexturedEffect.Parameters["render_matrix"].SetValue(Game1.camera.renderMatrix); }
+
         }
 
         public void LoadContent()
         {
             untexturedEffect = Game1.instance.Content.Load<Effect>("shaders/Untextured");
+            UpdateProjectionMatrix();
         }
 
         public void Begin()
@@ -83,7 +78,6 @@ namespace Physics
 
             if (this.shapeCount == 0) return; // Nothing to draw
 
-            untexturedEffect.Parameters["view_projection"].SetValue(effect.Projection);
             foreach (EffectPass pass in untexturedEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();

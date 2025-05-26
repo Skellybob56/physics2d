@@ -209,21 +209,33 @@ namespace Physics
             mouseStateUnfixed = Mouse.GetState();
             mousePos = mouseStateUnfixed.Position.ToVector2();
             mouseWorldPos = Vector2.Transform(mousePos, camera.pixelToWorldMatrix);
+            Debug.WriteLine(mouseWorldPos);
 
             if (mouseStateUnfixed.ScrollWheelValue != oldScrollWheelValue)
             {
                 if (mouseStateUnfixed.ScrollWheelValue > oldScrollWheelValue)
-                { camera.SetZoom(camera.cameraZoom + 0.2f); }
-                else { camera.SetZoom(camera.cameraZoom - 0.2f); }
+                { camera.SetZoomOnPoint(camera.cameraZoom + 1f, mouseWorldPos); }
+                else { camera.SetZoomOnPoint(camera.cameraZoom - 1f, mouseWorldPos); }
+
+                if (dragging)
+                {
+                    dragStartCameraPosition = camera.cameraPosition;
+                    dragStartMousePosition = mousePos;
+                }
+
                 Renderer.instance.UpdateProjectionMatrix();
             }
 
-            if (mouseStateUnfixed.MiddleButton == ButtonState.Pressed)
+            if (mouseStateUnfixed.MiddleButton == ButtonState.Pressed || keyboardStateUnfixed.IsKeyDown(Keys.Space))
             {
                 if (dragging)
                 {
-                    Debug.WriteLine(mousePos);
-                    camera.SetPosition(dragStartCameraPosition + Vector2.Transform(mousePos - dragStartMousePosition, camera.pixelToWorldMatrix));
+                    camera.SetPosition(dragStartCameraPosition -
+                        (mousePos - dragStartMousePosition) *
+                        new Vector2(camera.pixelToWorldMatrix.M11,
+                            camera.pixelToWorldMatrix.M22)
+                        );
+
                     Renderer.instance.UpdateProjectionMatrix();
                 }
                 else // first dragging frame

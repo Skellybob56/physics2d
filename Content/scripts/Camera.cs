@@ -40,6 +40,15 @@ namespace Physics.Content.scripts
         { this.cameraPosition = cameraPosition; }
         public void SetZoom(float cameraZoom)
         { this.cameraZoom = cameraZoom; }
+        public void SetZoomOnPoint(float cameraZoom, Vector2 center)
+        {
+            Debug.WriteLine($"{cameraZoom}, {center}");
+            float zoomDelta = MathF.Pow(2f, cameraZoom - this.cameraZoom);
+            this.cameraZoom = cameraZoom;
+            Debug.WriteLine(zoomDelta);
+            Debug.WriteLine((zoomDelta - 1f) / zoomDelta);
+            this.cameraPosition = cameraPosition.LerpVector2(center, (zoomDelta - 1f) / zoomDelta);
+        }
 
         public void UpdateMatricies(int viewportWidth, int viewportHeight)
         {
@@ -87,7 +96,7 @@ namespace Physics.Content.scripts
                 unitsPerPixel, 0f, 0f, 0f,
                 0f, -unitsPerPixel, 0f, 0f, // flip y
                 0f, 0f, 1f, 0f,
-                -cameraPosition.X - inverseRenderScale.X, -cameraPosition.Y + inverseRenderScale.Y, 0f, 1f
+                cameraPosition.X - inverseRenderScale.X, cameraPosition.Y + inverseRenderScale.Y, 0f, 1f
                 );
         }
     }
