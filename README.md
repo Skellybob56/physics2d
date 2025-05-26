@@ -7,15 +7,15 @@ I worked on the project in Python (using Pyglet) for five months on and off, bef
 This project was created on January 13th 2025 as I wanted to try MonoGame as a good, low level but cross platform base for C# applications with OpenGL.
 
 # Current features
-## Physics
+**Physics**
  - Solid Dynamic-Static colision and response
 
-## Camera
+**Camera**
  - Fully functional panning and zooming
  - Resolution agnostic 
 
 # Future features
-## Physics
+**Physics**
  - Bounciness
  - Friction
  - Dynamic-Dynamic Colision
