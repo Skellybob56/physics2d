@@ -222,6 +222,7 @@ namespace Physics
             {
                 if (dragging)
                 {
+                    Debug.WriteLine(mousePos);
                     camera.SetPosition(dragStartCameraPosition + Vector2.Transform(mousePos - dragStartMousePosition, camera.pixelToWorldMatrix));
                     Renderer.instance.UpdateProjectionMatrix();
                 }
