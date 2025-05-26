@@ -214,8 +214,8 @@ namespace Physics
             if (mouseStateUnfixed.ScrollWheelValue != oldScrollWheelValue)
             {
                 if (mouseStateUnfixed.ScrollWheelValue > oldScrollWheelValue)
-                { camera.SetZoomOnPoint(camera.cameraZoom + 1f, mouseWorldPos); }
-                else { camera.SetZoomOnPoint(camera.cameraZoom - 1f, mouseWorldPos); }
+                { camera.SetZoomOnPoint(camera.cameraZoom + 0.35f, mouseWorldPos); }
+                else { camera.SetZoomOnPoint(camera.cameraZoom - 0.35f, mouseWorldPos); }
 
                 if (dragging)
                 {
