@@ -42,11 +42,8 @@ namespace Physics.Content.scripts
         { this.cameraZoom = cameraZoom; }
         public void SetZoomOnPoint(float cameraZoom, Vector2 center)
         {
-            Debug.WriteLine($"{cameraZoom}, {center}");
             float zoomDelta = MathF.Pow(2f, cameraZoom - this.cameraZoom);
             this.cameraZoom = cameraZoom;
-            Debug.WriteLine(zoomDelta);
-            Debug.WriteLine((zoomDelta - 1f) / zoomDelta);
             this.cameraPosition = cameraPosition.LerpVector2(center, (zoomDelta - 1f) / zoomDelta);
         }
 
@@ -63,11 +60,11 @@ namespace Physics.Content.scripts
 
             scaleLimitingResolution = MathF.Min(viewportWidth, viewportHeight);
             pixelsPerUnit = (zoom/2f) * scaleLimitingResolution; // /2f because unit space is 2x2 wide
-            unitsPerPixel = (inverseZoom*2f) / scaleLimitingResolution;
+            unitsPerPixel = 1f / pixelsPerUnit;
 
             UpdateRenderMatrix();
-            UpdateWorldToPixelMatrix(viewportWidth, viewportHeight);
-            UpdatePixelToWorldMatrix(viewportWidth, viewportHeight);
+            UpdateWorldToPixelMatrix();
+            UpdatePixelToWorldMatrix();
         }
 
         private void UpdateRenderMatrix()
@@ -80,17 +77,17 @@ namespace Physics.Content.scripts
                 );
         }
 
-        private void UpdateWorldToPixelMatrix(int viewportWidth, int viewportHeight)
+        private void UpdateWorldToPixelMatrix()
         {
             worldToPixelMatrix = new Matrix(
                 pixelsPerUnit, 0f, 0f, 0f,
                 0f, -pixelsPerUnit, 0f, 0f, // flip y
                 0f, 0f, 1f, 0f,
-                cameraPosition.X * pixelsPerUnit + viewportWidth / 2f, cameraPosition.Y * pixelsPerUnit + viewportHeight / 2f, 0f, 1f
+                (inverseRenderScale.X - cameraPosition.X) * pixelsPerUnit, (inverseRenderScale.Y + cameraPosition.Y) * pixelsPerUnit, 0f, 1f
                 );
         }
 
-        private void UpdatePixelToWorldMatrix(int viewportWidth, int viewportHeight)
+        private void UpdatePixelToWorldMatrix()
         {
             pixelToWorldMatrix = new Matrix(
                 unitsPerPixel, 0f, 0f, 0f,

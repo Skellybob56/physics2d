@@ -209,7 +209,6 @@ namespace Physics
             mouseStateUnfixed = Mouse.GetState();
             mousePos = mouseStateUnfixed.Position.ToVector2();
             mouseWorldPos = Vector2.Transform(mousePos, camera.pixelToWorldMatrix);
-            Debug.WriteLine(mouseWorldPos);
 
             if (mouseStateUnfixed.ScrollWheelValue != oldScrollWheelValue)
             {
