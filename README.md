@@ -1,18 +1,26 @@
-# Physics 2D
-This is a WIP 2D rigidbody simulator written in C# with MonoGame.<br>
-It works on the basis that any colision between two arbitrary polygons will be between one point and one line.
-If you trace the subtick motion of a point on a polygon using a straight line and check if this motion intersects with any lines from other colliders, you can consistantly detect colisions.<br>
-I devised of this method of collision detection in August 2024 and I wanted to see if I could make rigidbody colision in 2D without doing any research on colision detection and response.
-I worked on the project in Python (using Pyglet) for five months on and off, before leaving Python due to scale and performance concerns. 
-This project was created on January 13th 2025 as I wanted to try MonoGame as a good, low level but cross platform base for C# applications with OpenGL.
+# Physics2D
+**Physics2D** is a custom 2D rigidbody physics engine written in C# using MonoGame.<br>
+It will support collisions with static (unmoving) and dynamic (moving) physics objects.
+Physics objects contain a collider of arbitrary convex or concave ngons, with configurable physics properties
+
+## Collision Detection Method
+This engine is based on a novel approach I devised in August 2024:
+> Any collision between two arbitrary polygons in 2D can be reduced to a point-line intersection.
+
+Each vertex of a moving polygon is traced linearly across a sub-tick timestep.
+These trajectories are tested for intersections against the static edges of other polygons.
+This enables consistent and robust detection of point-line collisions without relying on SAT or impulse-based resolution.
+
+## Development History
+- **Initial concept:** Developed in Python with Pyglet (Aug 2024–Jan 2025) to test feasibility.
+- **C# port:** Started in January 2025 using MonoGame for performance, cross-platform rendering, and better scaling potential.
 
 # Current features
 **Physics**
- - Solid Dynamic-Static colision and response
-
-**Camera**
- - Fully functional panning and zooming
- - Resolution agnostic 
+ - Convex & concave polygon support
+ - Solid Dynamic-Static colision and material led response
+  - View matrix system (pan + zoom)
+  - Internal ngon triangulation via ear clipping
 
 # Future features
 **Physics**
@@ -21,3 +29,6 @@ This project was created on January 13th 2025 as I wanted to try MonoGame as a g
  - Dynamic-Dynamic Colision
  - Rotation
  - Primative Colliders
+
+## Purpose
+This project is a technology testbed for a future custom 3D engine. It lays the foundation for robust collision detection, physics response, and custom rendering control—all of which will feed into a larger game engine project.
