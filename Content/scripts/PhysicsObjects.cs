@@ -98,6 +98,11 @@ namespace Physics
         public float mass { get; protected set; }
         public int maxCollisionDepth { get; protected set; }
 
+        private float collisionFriction;
+        private float timePassed;
+        private float remainingTime;
+        private Vector2 absorbedVelocity;
+
         public DynamicObject() : base()
         {
             Initialize(Vector2.Zero, 1f, 4);
@@ -126,26 +131,44 @@ namespace Physics
 
             Vector2 maxDisplacement = displacement;
 
+            PhysicsObject collidingObject = null;
+
             Vector2 normal = Vector2.Zero;
             foreach (StaticObject staticObject in staticObjects.Values)
             {
                 if (CollisionCheck(this, staticObject, ref displacement, ref normal))
                 {
+                    collidingObject = staticObject;
                     // Debug.WriteLine($"collided at {this.position + displacement} with normal {normal}");
                 }
             }
 
             // TODO: dynamic collisions
-            // Debug.WriteLine(displacement);
+
             position += displacement;
 
-            if (normal == Vector2.Zero) { return; } // no collision
+            if (normal == Vector2.Zero)
+            { // no collision
+                if (depth != 1)
+                { // not first subtick
+                    velocity *= MathF.Pow(1f - collisionFriction, deltaTime); // apply friction
+                }
+                return; 
+            }
 
-            float remainingTime = (1 - MathF.Max(MathF.Abs(displacement.X), MathF.Abs(displacement.Y)) /
-                MathF.Max(MathF.Abs(maxDisplacement.X), MathF.Abs(maxDisplacement.Y))) * deltaTime;
+            timePassed = MathF.Max(MathF.Abs(displacement.X), MathF.Abs(displacement.Y)) /
+                MathF.Max(MathF.Abs(maxDisplacement.X), MathF.Abs(maxDisplacement.Y)) * deltaTime;
 
-            velocity = velocity.ProjectOnLine(normal); // projecting velocity to the line
-            velocity += normal * (1f / 8f); // fix for sticking bug
+            remainingTime = deltaTime - timePassed;
+
+            absorbedVelocity = normal * normal.Dot(velocity);
+            velocity -= absorbedVelocity; // absorb energy
+
+            collisionFriction = MathF.Sqrt(physicsMaterial.friction * collidingObject.physicsMaterial.friction); // geometric mean
+            velocity *= MathF.Pow(1f - collisionFriction, timePassed); // apply friction
+
+            velocity -= absorbedVelocity * // reflect energy
+                (1f - (1f-physicsMaterial.bounciness)*(1f-collidingObject.physicsMaterial.bounciness));
 
             if (depth == maxCollisionDepth || remainingTime == 0) { return; }
 
@@ -267,7 +290,10 @@ namespace Physics
 
     struct PhysicsMaterial
     {
-        public static readonly PhysicsMaterial Zero = new(0f, 0f);
+        public static readonly PhysicsMaterial Zero = new(0f, 0.999f);
+        public static readonly PhysicsMaterial One = new(1f, 1f);
+        public static readonly PhysicsMaterial Bouncy = new(1f, 0f);
+        public static readonly PhysicsMaterial Inert = new(0f, 1f);
 
         public float bounciness;
         public float friction; 
